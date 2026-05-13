@@ -2058,15 +2058,12 @@ async function exportSite(){
     `let _ap='${liveAp}';`
   );
 
-  // 4. If the DATA marker was missing (edge case), fall back to script injection
+  // 4. If the DATA marker was missing (edge case), fall back to patching the
+  //    const DATA = []; line directly
   if(!src.includes('/*DATA_START*/')) {
     src = src.replace(
-      '</body>',
-      `<script id="_injected_data">
-const DATA = ${liveData};
-let SITE_CONFIG = ${liveConfig};
-let _ap = '${liveAp}';
-</script></body>`
+      /const DATA = \[\];/,
+      `const DATA = ${liveData};`
     );
   }
 
