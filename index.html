@@ -1762,39 +1762,58 @@ function buildSwipeCard(){
     ${swipeIdx<DATA.length-1?'<div style="position:absolute;inset:0;border-radius:22px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);transform:translateY(9px) scale(.96);z-index:0"></div>':''}
     <div id="swipe-card" style="position:relative;z-index:1;cursor:grab;border-radius:22px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.6)">
       <div style="height:300px;position:relative;background:linear-gradient(160deg,#1a0d30,#0c0818)">
-        ${c.photo?`<img src="${c.photo}" alt="${c.name}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.style.display='none'"/>`:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:72px">'+(SE[c.sign]||'💫')+'</div>'}
+        ${c.photo?`<img src="${c.photo}" alt="${c.name}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.style.display='none'"/>`:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:72px">'+(SE[isChar?(c.characterSign||c.sign):c.sign]||'💫')+'</div>'}
         <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(8,5,18,.97))"></div>
         <div style="position:absolute;top:14px;left:14px">${crushTypeBadge(c.crushType,c.characterName)}</div>
         <div style="position:absolute;top:14px;right:14px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:3px 11px;font-size:10px;color:#c084fc;letter-spacing:.1em">${c.month} ${c.year}</div>
         <div style="position:absolute;bottom:0;left:0;right:0;padding:20px 20px 14px">
           ${isChar?`<div style="font-size:11px;color:#fb923c;letter-spacing:.06em;margin-bottom:4px">${c.characterName} — <span style="color:rgba(255,255,255,.45)">${c.characterFrom}</span></div>`:''}
-          <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:#fff;line-height:1.05;text-shadow:0 2px 14px rgba(0,0,0,.9)">${c.name}</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:3px">${c.profession||''} · ${c.nationality||''}</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:#fff;line-height:1.05;text-shadow:0 2px 14px rgba(0,0,0,.9)">${isChar?c.characterName:c.name}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:3px">${isChar?`played by ${c.name}`:`${c.profession||''} · ${c.nationality||''}`}</div>
         </div>
       </div>
       <div style="background:#0a0614;padding:16px 20px 22px">
-        ${isChar?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        ${isChar?`
+        <!-- Character sign + element + MBTI pills -->
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
+          ${c.characterSign?pill(`${SE[c.characterSign]||'✦'} ${c.characterSign}`,'#fb923c'):''}
+          ${c.characterSign&&ELEM[c.characterSign]?pill(ELEM[c.characterSign],EC[ELEM[c.characterSign]],EE[ELEM[c.characterSign]]):''}
+          ${c.mbti?pill(c.mbti,MBTI_C[c.mbti]||'#7c3aed'):''}
+          ${c.characterAttachment?pill(c.characterAttachment,'#f87171','',true):''}
+        </div>
+        <!-- Traits split -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
           <div style="background:rgba(251,146,60,.07);border:1px solid rgba(251,146,60,.18);border-radius:12px;padding:10px 12px">
             <div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#fb923c88;margin-bottom:6px">🎭 Character</div>
-            <div style="display:flex;flex-wrap:wrap;gap:4px">${(c.characterTraits||[]).map(t=>pill(t,'#fb923c','',true)).join('')}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${(c.characterTraits||[]).map(t=>pill(t,'#fb923c','',true)).join('')||'<span style="font-size:11px;color:#5a4870">—</span>'}</div>
           </div>
           <div style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.18);border-radius:12px;padding:10px 12px">
-            <div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#818cf888;margin-bottom:6px">⭐ Celeb</div>
-            <div style="display:flex;flex-wrap:wrap;gap:4px">${(c.traits||[]).map(t=>pill(t,'#818cf8','',true)).join('')}</div>
+            <div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#818cf888;margin-bottom:6px">⭐ Actor</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${(c.traits||[]).map(t=>pill(t,'#818cf8','',true)).join('')||'<span style="font-size:11px;color:#5a4870">—</span>'}</div>
           </div>
+        </div>
+        <!-- Character stats grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${c.characterArchetype?miniStat('✦','Character Archetype',c.characterArchetype,'#f8c07c'):''}
+          ${c.characterAesthetic?miniStat('💫','Character Vibe',c.characterAesthetic,'#fb923c'):''}
+          ${c.loveLanguage?miniStat('💝','Love Language',c.loveLanguage,'#f472b6'):''}
+          ${c.knowFor?miniStat('⚡','Known For',c.knowFor,'#7cc8f8'):''}
+          ${c.archetype?miniStat('🌟','Actor Archetype',c.archetype,'#818cf8'):''}
+          ${c.aesthetic?miniStat('🎨','Actor Vibe',c.aesthetic,'#a78bfa'):''}
         </div>`:
         `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px">
           ${c.sign?pill(`${SE[c.sign]||'✦'} ${c.sign}`,'#e879c0'):''}
           ${c.element?pill(c.element,EC[c.element],EE[c.element]):''}
           ${c.mbti?pill(c.mbti,MBTI_C[c.mbti]||'#7c3aed'):''}
+          ${c.attachmentStyle?pill(c.attachmentStyle,'#4ade80','',true):''}
           ${(c.traits||[]).slice(0,3).map(t=>pill(t,'#7cc8f8','',true)).join('')}
-        </div>`}
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           ${c.archetype?miniStat('✦','Archetype',c.archetype,'#f8c07c'):''}
           ${c.aesthetic?miniStat('💫','Vibe',c.aesthetic,'#c084fc'):''}
           ${c.loveLanguage?miniStat('💝','Love Language',c.loveLanguage,'#f472b6'):''}
           ${c.knowFor?miniStat('⚡','Known For',c.knowFor,'#7cc8f8'):''}
-        </div>
+        </div>`}
         ${c.note?`<div style="font-size:11px;color:#5a4870;font-style:italic;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05)">&ldquo;${c.note}&rdquo;</div>`:''}
       </div>
     </div>
@@ -1845,63 +1864,105 @@ function renderAnalysis(){
 
   const actors=DATA.filter(c=>c.crushType!=='character');
   const chars=DATA.filter(c=>c.crushType==='character');
-  const signC={},elemC={},traitC={},mbtiC={},attachC={},charSignC={},charAttachC={},llC={},archetypeC={},aestheticC={};
-  // allSignC / allElemC combine real-person signs + character signs so Top Sign tracks everything
-  const allSignC={},allElemC={};
+
+  // Separate counters for clean, accurate insights
+  const signC={},          // actor/celeb signs only
+        elemC={},          // actor/celeb elements only
+        actorArchetypeC={},// actor/celeb archetypes
+        actorAestheticC={},// actor/celeb aesthetics
+        charSignC={},      // character zodiac signs
+        charElemC={},      // character elements
+        charArchetypeC={}, // character archetypes
+        charAestheticC={}, // character aesthetics
+        charAttachC={},    // character attachment styles
+        attachC={},        // ALL entries' actor attachment styles (real persons + actors behind chars)
+        mbtiC={},          // ALL entries' actor MBTI
+        llC={},            // ALL entries' love language
+        traitC={};         // ALL traits (actor traits + character traits)
+
+  // allSignC / allElemC: character sign takes priority for chars, actor sign for celebs
+  const allSignC={}, allElemC={};
+
   DATA.forEach(c=>{
-    if(c.crushType==='character'){
-      // Character's own zodiac sign → charSignC + allSignC
+    const isChar = c.crushType==='character';
+
+    if(isChar){
+      // ── Character-specific fields ──────────────────────────────────────────
       if(c.characterSign){
         charSignC[c.characterSign]=(charSignC[c.characterSign]||0)+1;
         allSignC[c.characterSign]=(allSignC[c.characterSign]||0)+1;
         const cElem=ELEM[c.characterSign];
-        if(cElem) allElemC[cElem]=(allElemC[cElem]||0)+1;
+        if(cElem){ charElemC[cElem]=(charElemC[cElem]||0)+1; allElemC[cElem]=(allElemC[cElem]||0)+1; }
+      } else {
+        // fallback: if no characterSign, use actor sign for allSignC
+        const fallSgn=c.actorSign||c.sign;
+        if(fallSgn){
+          allSignC[fallSgn]=(allSignC[fallSgn]||0)+1;
+          const fElem=ELEM[fallSgn]; if(fElem) allElemC[fElem]=(allElemC[fElem]||0)+1;
+        }
       }
-      if(c.characterAttachment){ charAttachC[c.characterAttachment]=(charAttachC[c.characterAttachment]||0)+1; }
-      // Actor's real sign still goes into signC (for real-person breakdown) + allSignC
+      if(c.characterAttachment) charAttachC[c.characterAttachment]=(charAttachC[c.characterAttachment]||0)+1;
+      if(c.characterArchetype)  charArchetypeC[c.characterArchetype]=(charArchetypeC[c.characterArchetype]||0)+1;
+      if(c.characterAesthetic)  charAestheticC[c.characterAesthetic]=(charAestheticC[c.characterAesthetic]||0)+1;
+
+      // ── Actor behind the character (also count their real-sign for signC) ──
       const actSgn=c.actorSign||c.sign;
       if(actSgn){
         signC[actSgn]=(signC[actSgn]||0)+1;
-        const actElem=ELEM[actSgn];
-        if(actElem) elemC[actElem]=(elemC[actElem]||0)+1;
-        // Only add actor sign to allSignC if the character has no sign of their own
-        if(!c.characterSign){
-          allSignC[actSgn]=(allSignC[actSgn]||0)+1;
-          if(actElem) allElemC[actElem]=(allElemC[actElem]||0)+1;
-        }
+        const actElem=ELEM[actSgn]; if(actElem) elemC[actElem]=(elemC[actElem]||0)+1;
       }
-      // Character archetype/aesthetic for insights
-      if(c.characterArchetype) archetypeC[c.characterArchetype]=(archetypeC[c.characterArchetype]||0)+1;
-      if(c.characterAesthetic) aestheticC[c.characterAesthetic]=(aestheticC[c.characterAesthetic]||0)+1;
+      if(c.archetype)  actorArchetypeC[c.archetype]=(actorArchetypeC[c.archetype]||0)+1;
+      if(c.aesthetic)  actorAestheticC[c.aesthetic]=(actorAestheticC[c.aesthetic]||0)+1;
+
+      // Character traits
+      (c.characterTraits||[]).forEach(t=>{ traitC[t]=(traitC[t]||0)+1; });
+
     } else {
+      // ── Real celeb / real person ───────────────────────────────────────────
       if(c.sign){
         signC[c.sign]=(signC[c.sign]||0)+1;
         allSignC[c.sign]=(allSignC[c.sign]||0)+1;
         const elem=c.element||ELEM[c.sign];
         if(elem){ elemC[elem]=(elemC[elem]||0)+1; allElemC[elem]=(allElemC[elem]||0)+1; }
       }
-      if(c.archetype) archetypeC[c.archetype]=(archetypeC[c.archetype]||0)+1;
-      if(c.aesthetic) aestheticC[c.aesthetic]=(aestheticC[c.aesthetic]||0)+1;
-      if(c.attachmentStyle) attachC[c.attachmentStyle]=(attachC[c.attachmentStyle]||0)+1;
+      if(c.archetype)  actorArchetypeC[c.archetype]=(actorArchetypeC[c.archetype]||0)+1;
+      if(c.aesthetic)  actorAestheticC[c.aesthetic]=(actorAestheticC[c.aesthetic]||0)+1;
     }
-    if(c.mbti) mbtiC[c.mbti]=(mbtiC[c.mbti]||0)+1;
-    if(c.loveLanguage) llC[c.loveLanguage]=(llC[c.loveLanguage]||0)+1;
+
+    // ── Fields that apply to every entry (actor/celeb data) ───────────────
+    if(c.attachmentStyle) attachC[c.attachmentStyle]=(attachC[c.attachmentStyle]||0)+1;
+    if(c.mbti)            mbtiC[c.mbti]=(mbtiC[c.mbti]||0)+1;
+    if(c.loveLanguage)    llC[c.loveLanguage]=(llC[c.loveLanguage]||0)+1;
     (c.traits||[]).forEach(t=>{ traitC[t]=(traitC[t]||0)+1; });
-    (c.characterTraits||[]).forEach(t=>{ traitC[t]=(traitC[t]||0)+1; });
   });
   const sd=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]);
-  // topSign and topElem use allSignC/allElemC so character signs count too
-  const topSign=sd(allSignC)[0]; const topElem=sd(allElemC)[0]; const topTraits=sd(traitC).slice(0,6); const topMBTI=sd(mbtiC)[0]; const topAttach=sd(attachC)[0];
+  // topSign / topElem use allSignC/allElemC so character signs count too
+  const topSign=sd(allSignC)[0]; const topElem=sd(allElemC)[0];
+  const topTraits=sd(traitC).slice(0,6); const topMBTI=sd(mbtiC)[0]; const topAttach=sd(attachC)[0];
   const maxT=topTraits[0]?.[1]||1;
   const byYear={};
   DATA.forEach(c=>{ byYear[c.year]=byYear[c.year]||[]; byYear[c.year].push(c); });
   const radarData=["Fire","Earth","Air","Water"].map(e=>({axis:e,value:Math.round(((allElemC[e]||0)/DATA.length)*100)}));
   const topElemName=topElem?.[0];
+
   // ── Real data-driven insight strings ─────────────────────────────────────
-  // Secret Pattern: combine element dominance + top trait + top archetype
+  // Use combined archetype counts (char archetype + actor archetype) for "top archetype" in insights
+  const combinedArchetypeC={};
+  Object.entries(actorArchetypeC).forEach(([k,v])=>{ combinedArchetypeC[k]=(combinedArchetypeC[k]||0)+v; });
+  Object.entries(charArchetypeC).forEach(([k,v])=>{ combinedArchetypeC[k]=(combinedArchetypeC[k]||0)+v; });
+  const combinedAestheticC={};
+  Object.entries(actorAestheticC).forEach(([k,v])=>{ combinedAestheticC[k]=(combinedAestheticC[k]||0)+v; });
+  Object.entries(charAestheticC).forEach(([k,v])=>{ combinedAestheticC[k]=(combinedAestheticC[k]||0)+v; });
+
   const topTraitWord=topTraits[0]?.[0];
-  const topArchetype=Object.entries(archetypeC).sort((a,b)=>b[1]-a[1])[0]?.[0];
-  const topAesthetic=Object.entries(aestheticC).sort((a,b)=>b[1]-a[1])[0]?.[0];
+  const topArchetype=sd(combinedArchetypeC)[0]?.[0];
+  const topAesthetic=sd(combinedAestheticC)[0]?.[0];
+  // For the "Ideal Real Man" profile card, use actor-only archetype/aesthetic
+  const topActorArchetype=sd(actorArchetypeC)[0]?.[0];
+  const topActorAesthetic=sd(actorAestheticC)[0]?.[0];
+  // For "Fictional Type" profile, use char-only
+  const topCharArchetype=sd(charArchetypeC)[0]?.[0];
+  const topCharAesthetic=sd(charAestheticC)[0]?.[0];
   const elemBase=ELEM_INSIGHTS[topElemName]||"Your taste spans elements — you're drawn to complexity over type.";
   let secretPattern=elemBase;
   if(topArchetype&&topTraitWord){
@@ -1969,18 +2030,20 @@ function renderAnalysis(){
     loveBlindspot="No red flags recorded yet. Either they were perfect, or you haven't named it yet.";
   }
 
-  // Actor vs Character gap: real aesthetic comparison
+  // Actor vs Character gap: most common aesthetic from each side
   const actorAesthetics=actors.map(a=>a.aesthetic).filter(Boolean);
   const charAesthetics=chars.map(c=>c.characterAesthetic||c.aesthetic).filter(Boolean);
   let actorVsCharGap;
+  const bestActorAesthetic=topActorAesthetic||actorAesthetics[0];
+  const bestCharAesthetic=topCharAesthetic||charAesthetics[0];
   if(actors.length>0&&chars.length>0){
-    const realDesc=actorAesthetics.length>0?actorAesthetics[0]:"someone real and complex";
-    const fictDesc=charAesthetics.length>0?charAesthetics[0]:"something you can't have in reality";
+    const realDesc=bestActorAesthetic||"someone real and complex";
+    const fictDesc=bestCharAesthetic||"something you can't have in reality";
     actorVsCharGap=`In real life you want ${realDesc}. In fiction you chase ${fictDesc}. The gap between those two words is where your unmet longing lives.`;
   } else if(chars.length===0){
-    actorVsCharGap=`All real people — you want what actually exists. Your taste is grounded: ${actorAesthetics.slice(0,2).join(' and ')||'complexity you can actually touch'}.`;
+    actorVsCharGap=`All real people — you want what actually exists. Your taste is grounded: ${[...new Set(actorAesthetics)].slice(0,2).join(' and ')||'complexity you can actually touch'}.`;
   } else {
-    actorVsCharGap=`All fictional — the distance is the whole point. Real men haven't yet matched ${charAesthetics[0]||'what you imagine they could be'}.`;
+    actorVsCharGap=`All fictional — the distance is the whole point. Real men haven't yet matched ${bestCharAesthetic||'what you imagine they could be'}.`;
   }
 
   const spotifyVibes=DATA.filter(c=>c.spotifyVibe).map(c=>c.spotifyVibe).join(', ');
@@ -2036,10 +2099,13 @@ function renderAnalysis(){
       return `<div style="display:flex;flex-direction:column;gap:12px;animation:fadeUp .25s ease both">
         ${snack('🔬','The Gap',actorVsCharGap,'#a78bfa',true)}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          ${card(`<div class="sl" style="margin-bottom:8px">⭐ Real (${actors.length})</div>${actors.length===0?'<div style="color:var(--muted);font-size:12px">None yet</div>':actors.map(c=>`<div style="display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05);align-items:flex-start">${c.photo?`<img src="${c.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid rgba(99,102,241,.3);flex-shrink:0" onerror="this.style.display='none'" alt=""/>`:''}<div><div style="font-size:12px;color:#e0d4ff;font-weight:500">${c.name}</div><div style="font-size:10px;color:var(--muted)">${c.month} ${c.year}</div></div></div>`).join('')}`,'#818cf8')}
-          ${card(`<div class="sl" style="margin-bottom:8px">🎭 Fictional (${chars.length})</div>${chars.length===0?'<div style="color:var(--muted);font-size:12px">None yet</div>':chars.map(c=>`<div style="display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05);align-items:flex-start">${c.photo?`<img src="${c.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid rgba(251,146,60,.3);flex-shrink:0" onerror="this.style.display='none'" alt=""/>`:''}<div><div style="font-size:12px;color:#ffe0d4;font-weight:500">${c.characterName}</div><div style="font-size:10px;color:var(--muted)">${c.characterFrom}</div></div></div>`).join('')}`,'#fb923c')}
+          ${card(`<div class="sl" style="margin-bottom:8px">⭐ Real (${actors.length})</div>${actors.length===0?'<div style="color:var(--muted);font-size:12px">None yet</div>':actors.map(c=>`<div style="display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05);align-items:flex-start">${c.photo?`<img src="${c.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid rgba(99,102,241,.3);flex-shrink:0" onerror="this.style.display='none'" alt=""/>`:''}<div><div style="font-size:12px;color:#e0d4ff;font-weight:500">${c.name}</div><div style="font-size:10px;color:var(--muted)">${c.sign?SE[c.sign]+' ':''} ${c.sign||''} · ${c.month} ${c.year}</div></div></div>`).join('')}`,'#818cf8')}
+          ${card(`<div class="sl" style="margin-bottom:8px">🎭 Fictional (${chars.length})</div>${chars.length===0?'<div style="color:var(--muted);font-size:12px">None yet</div>':chars.map(c=>`<div style="display:flex;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05);align-items:flex-start">${c.photo?`<img src="${c.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid rgba(251,146,60,.3);flex-shrink:0" onerror="this.style.display='none'" alt=""/>`:''}<div><div style="font-size:12px;color:#ffe0d4;font-weight:500">${c.characterName}</div><div style="font-size:10px;color:var(--muted)">${c.characterSign?SE[c.characterSign]+' '+c.characterSign:'—'} · ${c.characterFrom}</div></div></div>`).join('')}`,'#fb923c')}
         </div>
-        ${chars.length>0&&sd(charSignC).length>0?card(`<div class="sl" style="margin-bottom:10px">Character Sign Energy</div>${sd(charSignC).map(([s,v])=>barHTML(`${SE[s]||'✦'} ${s}`,v,sd(charSignC)[0][1],'#fb923c')).join('')}`):''}
+        ${sd(charSignC).length>0?card(`<div class="sl" style="margin-bottom:10px">🎭 Character Sign Energy</div>${sd(charSignC).map(([s,v])=>barHTML(`${SE[s]||'✦'} ${s}`,v,sd(charSignC)[0][1],'#fb923c')).join('')}`):''}
+        ${sd(signC).length>0?card(`<div class="sl" style="margin-bottom:10px">⭐ Actor Sign Energy</div>${sd(signC).map(([s,v])=>barHTML(`${SE[s]||'✦'} ${s}`,v,sd(signC)[0][1],'#818cf8')).join('')}`):''}
+        ${sd(charArchetypeC).length>0?card(`<div class="sl" style="margin-bottom:10px">🎭 Character Archetypes</div>${sd(charArchetypeC).map(([a,v])=>barHTML(a,v,sd(charArchetypeC)[0][1],'#fb923c')).join('')}`):''}
+        ${sd(actorArchetypeC).length>0?card(`<div class="sl" style="margin-bottom:10px">⭐ Actor Archetypes</div>${sd(actorArchetypeC).map(([a,v])=>barHTML(a,v,sd(actorArchetypeC)[0][1],'#818cf8')).join('')}`):''}
       </div>`;
     }
     if(t==='mbti'){
@@ -2050,8 +2116,8 @@ function renderAnalysis(){
     }
     if(t==='attach'){
       return `<div style="display:flex;flex-direction:column;gap:12px;animation:fadeUp .25s ease both">
-        ${card(`<div class="sl">Attachment Styles (Real Persons)</div>${sd(attachC).length===0?'<div style="color:var(--muted);font-size:12px">No data yet</div>':sd(attachC).map(([a,v])=>barHTML(a,v,sd(attachC)[0][1],ATTACH_C[a]||'#c084fc')).join('')}`)}
-        ${chars.length>0?card(`<div class="sl">Attachment Styles (Characters)</div>${sd(charAttachC).length===0?'<div style="color:var(--muted);font-size:12px">No character data</div>':sd(charAttachC).map(([a,v])=>barHTML(a+' (char)',v,sd(charAttachC)[0][1],'#fb923c')).join('')}`):''}
+        ${card(`<div class="sl">Attachment Styles (All Actors / Real Persons)</div>${sd(attachC).length===0?'<div style="color:var(--muted);font-size:12px">No data yet</div>':sd(attachC).map(([a,v])=>barHTML(a,v,sd(attachC)[0][1],ATTACH_C[a]||'#c084fc')).join('')}`)}
+        ${chars.length>0?card(`<div class="sl">Attachment Styles (Characters)</div>${sd(charAttachC).length===0?'<div style="color:var(--muted);font-size:12px">No character attachment data</div>':sd(charAttachC).map(([a,v])=>barHTML(a+' (char)',v,sd(charAttachC)[0][1],'#fb923c')).join('')}`):''}
         ${sd(attachC).slice(0,2).map(([a])=>card(`<div class="sl" style="margin-bottom:6px">${a}</div><div style="font-size:13px;color:#c0b0e0;line-height:1.65">${ATTACH_DESC[a]||'Complex patterns.'}</div>`,ATTACH_C[a]||'#c084fc')).join('')}
       </div>`;
     }
@@ -2069,16 +2135,17 @@ function renderAnalysis(){
     }
     if(t==='profile'){
       const compatibleSigns=topSign?COMPAT[topSign[0]]||[]:[];
-      const realProfile=actors.length>0?[topAesthetic,topArchetype,topTraitWord].filter(Boolean).join(' · '):'—';
-      const charProfile=chars.length>0?[chars.map(c=>c.characterArchetype||c.characterAesthetic).filter(Boolean)[0],sd(charSignC)[0]?`${SE[sd(charSignC)[0][0]]||''} ${sd(charSignC)[0][0]} energy`:null].filter(Boolean).join(', '):'—';
+      const realProfile=actors.length>0||chars.length>0?[topActorAesthetic,topActorArchetype,topTraitWord].filter(Boolean).join(' · '):'—';
+      const charProfile=chars.length>0?[topCharArchetype,sd(charSignC)[0]?`${SE[sd(charSignC)[0][0]]||''} ${sd(charSignC)[0][0]} energy`:null,topCharAesthetic].filter(Boolean).join(', '):'—';
+      const topActorAttach=sd(attachC)[0]; // attachment covers all actors
       return `<div style="display:flex;flex-direction:column;gap:12px;animation:fadeUp .25s ease both">
-        ${actors.length>0?card(`<div style="font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:#818cf855;margin-bottom:8px">⭐ Your Ideal Real Man</div><div style="font-size:15px;color:#ede8ff;line-height:1.8">${topElemName?`You're drawn to ${topElemName} energy — `:''}${realProfile!=='—'?realProfile:'creative, complex people'}${topAttach?` who tend toward ${topAttach[0].toLowerCase()} attachment.`:' — people who leave an impression.'}</div>`,'#818cf8',true):''}
+        ${card(`<div style="font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:#818cf855;margin-bottom:8px">⭐ Your Ideal Real Man</div><div style="font-size:15px;color:#ede8ff;line-height:1.8">${topElemName?`You're drawn to ${topElemName} energy — `:''}${realProfile!=='—'?realProfile:'creative, complex people'}${topActorAttach?` who tend toward ${topActorAttach[0].toLowerCase()} attachment.`:' — people who leave an impression.'}</div>`,'#818cf8',true)}
         ${chars.length>0?card(`<div style="font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:#fb923c55;margin-bottom:8px">🎭 Your Fictional Type</div><div style="font-size:15px;color:#fff4ee;line-height:1.8">${charProfile!=='—'?charProfile:'The ones who are fictional for a reason'} — you love the type who exists fully only in story.</div>`,'#fb923c',true):''}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           ${miniStat('💘','Compatible Sign',compatibleSigns[0]?`${SE[compatibleSigns[0]]||''} ${compatibleSigns[0]}`:'—','#e879c0')}
           ${miniStat('🧠','MBTI Magnet',topMBTI?.[0]||'—',MBTI_C[topMBTI?.[0]]||'#8b5cf6')}
           ${miniStat('🌊','His Element',topElem?`${EE[topElem[0]]} ${topElem[0]}`:'—',topElem?EC[topElem[0]]:'#c084fc')}
-          ${miniStat('✦','His Archetype',topArchetype||'—','#f8c07c')}
+          ${miniStat('✦','Top Archetype',topArchetype||'—','#f8c07c')}
         </div>
         ${compatibleSigns.length>0?card(`<div class="sl" style="margin-bottom:10px">Compatible Signs for You</div><div style="display:flex;gap:8px;flex-wrap:wrap">${compatibleSigns.map(s=>`<div style="padding:8px 14px;background:rgba(232,121,192,.08);border:1px solid rgba(232,121,192,.22);border-radius:12px;text-align:center"><div style="font-size:20px">${SE[s]||'✦'}</div><div style="font-size:11px;color:#e879c0;margin-top:3px">${s}</div></div>`).join('')}</div>`):''}
       </div>`;
