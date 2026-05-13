@@ -1109,7 +1109,7 @@ NOW fill this for: [PERSON NAME HERE]</div>
 </div>
 
 <!-- ── Admin Modal ─────────────────────────────────────────────────────────── -->
-<div id="admin-modal" class="open">
+<div id="admin-modal">
   <div id="admin-inner">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
       <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:#e8c8ff">✦ Admin</div>
@@ -1120,15 +1120,15 @@ NOW fill this for: [PERSON NAME HERE]</div>
     </div>
 
     <!-- Login gate -->
-    <div id="admin-login" class="card" style="margin-bottom: 20px; display: none;">
+    <div id="admin-login" class="card" style="margin-bottom:20px;display:none;">
       <div class="sl" style="margin-bottom:12px">Password</div>
       <input class="inp" type="password" id="admin-pw-input" placeholder="Enter admin password" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')checkAdminPw()">
-      <div id="admin-pw-error" style="display: block; color: rgb(255, 128, 128); font-size: 12px; margin-bottom: 10px;">Wrong password.</div>
+      <div id="admin-pw-error" style="display:none;color:#ff8080;font-size:12px;margin-bottom:10px;">Wrong password.</div>
       <button class="btn" onclick="checkAdminPw()">Unlock</button>
     </div>
 
     <!-- Tabs (shown after login) -->
-    <div id="admin-panel" style="display: block;">
+    <div id="admin-panel" style="display:none;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="admin-tabs">
         <button class="admin-tab-btn" data-atab="insights">📊 Insights</button>
         <button class="admin-tab-btn" data-atab="crushes">💌 Crushes</button>
@@ -2759,7 +2759,6 @@ async function exportSite(){
   let src = document.documentElement.outerHTML;
 
   // 1. Inject live DATA between the /*DATA_START*/ … /*DATA_END*/ markers.
-  //    outerHTML preserves JS comment text inside <script> tags.
   src = src.replace(
     /\/\*DATA_START\*\/[\s\S]*?\/\*DATA_END\*\//,
     `/*DATA_START*/\nconst DATA = ${liveData};\n/*DATA_END*/`
@@ -2785,6 +2784,13 @@ async function exportSite(){
       `const DATA = ${liveData};`
     );
   }
+
+  // 5. Always reset modal/panel states so saved HTML opens cleanly (not mid-session)
+  src = src.replace(/(<div id="admin-modal")[^>]*>/,  '$1>');
+  src = src.replace(/(<div id="admin-login"[^>]*style=")[^"]*"/,  '$1display:none;"');
+  src = src.replace(/(<div id="admin-panel"[^>]*style=")[^"]*"/,  '$1display:none;"');
+  src = src.replace(/(<div id="admin-pw-error"[^>]*style=")[^"]*"/,'$1display:none;"');
+  src = src.replace(/(<div id="edit-modal")[^>]*>/,   '$1>');
 
   const btns = document.querySelectorAll('[onclick="exportSite()"]');
   const origLabels = [...btns].map(b => b.textContent);
